@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proofism • Intelligence System</title>
+    <title>Proofism • Deep Analysis</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #030303;
             --text-color: #ffffff;
             --accent-green: #00ff41;
+            --glow-color: rgba(0, 255, 65, 0.2);
             --border-color: #2a2a2a;
-            --polished-gradient: linear-gradient(135deg, #181818 0%, #111 50%, #181818 100%);
+            --polished-gradient: linear-gradient(135deg, #151515 0%, #0a0a0a 100%);
         }
 
         body {
@@ -23,7 +24,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         .container { width: 100%; max-width: 550px; padding: 20px; text-align: center; }
@@ -32,48 +33,65 @@
         header h1 { font-size: 3.5rem; font-weight: 300; margin: 0; letter-spacing: -2px; }
         .sub-title { font-size: 0.7rem; letter-spacing: 4px; color: #555; text-transform: uppercase; margin-bottom: 40px; }
 
-        /* --- CARDS --- */
+        /* --- CARDS CON BRILLO --- */
         .option-card {
             background: var(--polished-gradient);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 22px;
+            margin-bottom: 15px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: space-between;
             text-decoration: none;
             color: white;
+            box-shadow: 0 0 0px rgba(0,0,0,0);
         }
-        .option-card:hover { border-color: #555; transform: translateY(-2px); }
-        .option-card.sebbi { border-color: #444; background: rgba(255,255,255,0.02); margin-top: 30px; }
+        .option-card:hover { 
+            border-color: var(--accent-green); 
+            box-shadow: 0 0 15px var(--glow-color);
+            transform: translateY(-2px);
+        }
 
-        /* --- TEST INTERFACE --- */
-        #loader-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; font-family: monospace; }
-        .matrix-text { color: var(--accent-green); font-size: 0.8rem; text-align: left; width: 80%; line-height: 1.5; }
-
-        #test-area { display: none; }
+        /* --- BOTONES DE RESPUESTA --- */
         .btn-ans { 
-            background: rgba(255,255,255,0.03); border: 1px solid #333; color: white; 
-            padding: 15px; width: 100%; margin: 8px 0; border-radius: 10px; cursor: pointer; text-align: left;
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid #333; 
+            color: #ccc; 
+            padding: 18px; 
+            width: 100%; 
+            margin: 10px 0; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            text-align: left;
+            font-size: 0.95rem;
+            transition: 0.3s;
         }
-        .btn-ans:hover { background: white; color: black; }
+        .btn-ans:hover { 
+            background: rgba(0, 255, 65, 0.05); 
+            border-color: var(--accent-green);
+            color: white;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
 
+        /* --- TEXTAREA --- */
         textarea {
-            width: 100%; background: #111; border: 1px solid #333; color: white;
+            width: 100%; background: #0a0a0a; border: 1px solid #333; color: white;
             padding: 15px; border-radius: 10px; font-family: inherit; margin-bottom: 15px; resize: none;
+            box-sizing: border-box;
         }
+        textarea:focus { border-color: var(--accent-green); outline: none; }
 
-        /* --- PROCESSING --- */
-        #processing-screen { display: none; }
+        /* --- PANTALLAS --- */
+        #loader-screen, #test-area, #processing-screen, #result-screen { display: none; }
+        #loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; font-family: monospace; }
+        
         .gear { font-size: 3rem; color: #555; animation: spin 2s linear infinite; margin-bottom: 20px; }
-        #timer { font-family: monospace; font-size: 1.5rem; color: var(--accent-green); }
-
-        /* --- RESULTS --- */
-        #result-screen { display: none; }
-        .percent { font-size: 5rem; font-weight: bold; margin: 20px 0; color: var(--accent-green); }
+        #timer { font-family: monospace; font-size: 1.8rem; color: var(--accent-green); text-shadow: 0 0 10px var(--glow-color); }
+        
+        .percent { font-size: 5rem; font-weight: bold; margin: 20px 0; color: var(--accent-green); text-shadow: 0 0 20px var(--glow-color); }
         .close-x { display: none; position: fixed; top: 20px; right: 20px; font-size: 2.5rem; cursor: pointer; color: #444; }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -88,26 +106,26 @@
         </header>
         
         <div class="option-card" onclick="startTest(30)">
-            <span>30 preguntas</span>
+            <span>30 preguntas (Nivel I)</span>
             <i class="fas fa-microchip"></i>
         </div>
         <div class="option-card" onclick="startTest(50)">
-            <span>50 preguntas</span>
+            <span>50 preguntas (Nivel II)</span>
             <i class="fas fa-brain"></i>
         </div>
         <div class="option-card" onclick="startTest(100)">
-            <span>100 preguntas</span>
+            <span>100 preguntas (Análisis Total)</span>
             <i class="fas fa-database"></i>
         </div>
 
-        <a href="https://colmenares0910-code.github.io/mi-pagina./" class="option-card sebbi">
+        <a href="https://colmenares0910-code.github.io/mi-pagina./" class="option-card" style="margin-top: 30px; border-color: #444;">
             <span>sebbi/web</span>
             <i class="fas fa-external-link-alt"></i>
         </a>
     </div>
 
     <div id="loader-screen">
-        <div class="matrix-text" id="matrix-lines"></div>
+        <div id="matrix-lines" style="color: var(--accent-green); width: 80%; font-size: 0.8rem;"></div>
     </div>
 
     <div class="container" id="test-area">
@@ -116,18 +134,29 @@
 
     <div class="container" id="processing-screen">
         <i class="fas fa-cog gear"></i>
-        <p style="letter-spacing: 2px;">SISTEMA ANALIZANDO RESPUESTAS PROFUNDAS...</p>
+        <p style="letter-spacing: 2px; color: #888;">CALIBRANDO RESULTADOS NEURONALES...</p>
         <div id="timer">00:00:00</div>
     </div>
 
     <div class="container" id="result-screen">
+        <div class="sub-title">ESCANEO FINALIZADO</div>
         <div class="percent" id="final-percent">0%</div>
-        <p id="final-msg" style="line-height: 1.8; color: #ccc;"></p>
+        <p id="final-msg" style="line-height: 1.8; color: #bbb;"></p>
     </div>
 
     <div class="close-x" id="exit-btn" onclick="location.reload()">×</div>
 
     <script>
+        // Banco de preguntas profundas
+        const bank = [
+            { t: 'choice', q: '¿Cómo reaccionas ante un sonido agudo o repetitivo que otros parecen no notar?', o: ['Siento una molestia física real', 'Me desconcentro totalmente', 'Lo noto pero puedo ignorarlo', 'No me afecta'] },
+            { t: 'choice', q: 'En una conversación, ¿qué tanto esfuerzo dedicas a mantener el contacto visual?', o: ['Es agotador y me distrae de lo que dicen', 'Lo fuerzo para parecer "normal"', 'Lo hago de forma natural', 'Prefiero mirar a otros lados'] },
+            { t: 'text', q: 'Escribe sobre una situación donde sentiste que las reglas sociales eran confusas o sin sentido para ti.' },
+            { t: 'choice', q: '¿Sueles tener intereses tan intensos que olvidas comer o dormir?', o: ['Sí, es mi estado constante', 'A veces con temas específicos', 'Rara vez', 'Nunca'] },
+            { t: 'choice', q: '¿Cómo describirías tu forma de organizar tus objetos personales?', o: ['Tienen un orden lógico estricto', 'Me molesta mucho si alguien los mueve', 'Ordenado pero flexible', 'Caótico'] },
+            { t: 'text', q: 'Si pudieras diseñar un mundo perfecto para tu comodidad, ¿cómo sería el ambiente y la gente?' }
+        ];
+
         let currentQuestions = [];
         let currentIndex = 0;
         let score = 0;
@@ -137,52 +166,39 @@
             const loader = document.getElementById('loader-screen');
             loader.style.display = 'flex';
             
-            const logs = ["CONNECTING_TO_NEURAL_NETWORK...", "ANALYZING_BEHAVIORAL_PATTERNS...", "BOOTING_EMPATHY_MODULE...", "DATA_ENCRYPTION_ENABLED...", "READY_FOR_SCAN..."];
             let i = 0;
+            const logs = ["ACCESSING_CORE...", "READING_SYNAPSES...", "MAPPING_SENSORY_DATA...", "FILTERING_NOISE...", "COMPILING_PROFILE..."];
             const interval = setInterval(() => {
                 document.getElementById('matrix-lines').innerHTML += `> ${logs[i % logs.length]}<br>`;
                 i++;
-                if(i > 12) { clearInterval(interval); loader.style.display = 'none'; initTest(num); }
-            }, 200);
+                if(i > 10) { clearInterval(interval); loader.style.display = 'none'; initTest(num); }
+            }, 180);
         }
 
         function initTest(num) {
             document.getElementById('test-area').style.display = 'block';
-            generateDeepQuestions(num);
-            showQuestion();
-        }
-
-        function generateDeepQuestions(num) {
+            // Generar mezcla de preguntas del banco + aleatorias para completar el número
             currentQuestions = [];
-            for(let i=1; i<=num; i++) {
-                if(i % 5 === 0) { // Cada 5 preguntas, una es de texto libre
-                    currentQuestions.push({
-                        type: 'text',
-                        text: `Análisis ${i}: Describe detalladamente cómo te sientes cuando un plan cambia de imprevisto.`
-                    });
-                } else {
-                    currentQuestions.push({
-                        type: 'choice',
-                        text: `Pregunta Profunda ${i}: ¿Cómo describirías tu enfoque hacia los detalles técnicos o patrones complejos?`,
-                        options: ["Enfoque absoluto y obsesivo", "Interés moderado", "Dificultad para concentrarme", "Lo percibo de forma intuitiva"]
-                    });
-                }
+            for(let i=0; i<num; i++) {
+                let base = bank[i % bank.length];
+                currentQuestions.push({...base});
             }
+            showQuestion();
         }
 
         function showQuestion() {
             const container = document.getElementById('question-container');
             const q = currentQuestions[currentIndex];
-            let html = `<p style="color: #444; font-size: 0.7rem; margin-bottom: 20px;">SYSTEM_SCAN: ${currentIndex + 1} / ${currentQuestions.length}</p>
-                        <h2 style="font-weight: 300; margin-bottom: 30px;">${q.text}</h2>`;
+            let html = `<p style="color: #444; font-size: 0.7rem;">ANÁLISIS DE SISTEMA ${currentIndex + 1} / ${currentQuestions.length}</p>
+                        <h2 style="font-weight: 300; margin-bottom: 30px;">${q.q}</h2>`;
 
-            if(q.type === 'choice') {
-                q.options.forEach((opt, idx) => {
-                    html += `<button class="btn-ans" onclick="handleAns(${idx > 0 ? 1 : 2})">${opt}</button>`;
+            if(q.t === 'choice') {
+                q.o.forEach((opt, idx) => {
+                    html += `<button class="btn-ans" onclick="handleAns(${3 - idx})">${opt}</button>`;
                 });
             } else {
-                html += `<textarea id="text-ans" rows="4" placeholder="Escribe tu respuesta aquí..."></textarea>
-                         <button class="btn-ans" style="text-align:center; background: var(--accent-green); color: black;" onclick="handleAns(2)">ENVIAR ANÁLISIS</button>`;
+                html += `<textarea id="text-ans" rows="5" placeholder="Escribe tu análisis interno..."></textarea>
+                         <button class="btn-ans" style="text-align:center; border-color: var(--accent-green); color: white;" onclick="handleAns(3)">ENVIAR RESPUESTA AL SISTEMA</button>`;
             }
             container.innerHTML = html;
         }
@@ -191,30 +207,30 @@
             score += pts;
             currentIndex++;
             if(currentIndex < currentQuestions.length) showQuestion();
-            else finishTest();
+            else finishProcessing();
         }
 
-        function finishTest() {
+        function finishProcessing() {
             document.getElementById('test-area').style.display = 'none';
             document.getElementById('processing-screen').style.display = 'block';
-            let seconds = 0;
-            const timerInt = setInterval(() => {
-                seconds += 0.01;
-                document.getElementById('timer').innerText = seconds.toFixed(2).replace('.', ':');
+            let sec = 0;
+            const int = setInterval(() => {
+                sec += 0.01;
+                document.getElementById('timer').innerText = sec.toFixed(2).replace('.', ':');
             }, 10);
 
             setTimeout(() => {
-                clearInterval(timerInt);
-                showFinalResult();
-            }, Math.random() * 5000 + 7000); // Piensa entre 7 y 12 segundos
+                clearInterval(int);
+                showResult();
+            }, Math.random() * 4000 + 6000);
         }
 
-        function showFinalResult() {
+        function showResult() {
             document.getElementById('processing-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
-            const p = Math.min(Math.round((score / (currentQuestions.length * 1.5)) * 100), 100);
+            const p = Math.min(Math.round((score / (currentQuestions.length * 2.5)) * 100), 100);
             document.getElementById('final-percent').innerText = p + "%";
-            document.getElementById('final-msg').innerText = "El sistema ha detectado una configuración neuronal única. Tu manera de procesar el mundo es profunda y llena de matices. Recuerda que ser diferente es lo que permite al mundo avanzar hacia nuevas perspectivas.";
+            document.getElementById('final-msg').innerText = "Tu perfil neurodivergente ha sido analizado con éxito. Tienes una forma increíblemente detallada de percibir la realidad, lo que te permite notar cosas que otros ignoran. Este resultado es un reflejo de tu singularidad.";
             
             setTimeout(() => { document.getElementById('exit-btn').style.display = 'block'; }, 10000);
         }
